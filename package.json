@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "slidev",
-    "build": "slidev build --base /mobius-deck/",
+    "build": "slidev build --base /talk-mobius/",
     "export": "slidev export"
   },
   "keywords": [],
