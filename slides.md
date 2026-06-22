@@ -321,36 +321,14 @@ How agents (and humans) verify correctness:
 
 The agent doesn't just run tests — it **knows what a failure means** and can fix it.
 
-### Result: most models are added in < 30 minutes
+### Result: most models are added in 1–2 days
 
-(Including test generation, weight mapping, and L1-L5 validation)
-
-</v-clicks>
-
----
-
-# Multi-Agent Coordination
-
-<div class="mt-4">
-
-Real experience running **10-17 parallel agents** on the same repo:
-
-</div>
-
-<v-clicks>
-
-- 🌳 **Git worktree isolation** — each agent gets its own working copy
-- 📝 **Commit protocols** — structured messages, no conflicts
-- 🔄 **Failure recovery** — agents retry with diagnostic context
-- 📊 **Progress tracking** — centralized status across all agents
+(Including test generation, weight mapping, and L1-L5 validation.  
+Multiple models run **in parallel** → team throughput stays high.)
 
 </v-clicks>
 
-<div v-click class="mt-6 text-center text-lg">
 
-One human orchestrating a fleet of agents → coverage that would take months done in days.
-
-</div>
 
 ---
 
