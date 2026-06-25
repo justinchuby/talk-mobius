@@ -33,7 +33,7 @@ layout: center
 # The Problem
 
 <!--
-[翻到这页时不用说太多，visual break。下一页的bullet points会展开痛点。]
+[Visual break. 下一页的bullets展开痛点。]
 -->
 
 ---
@@ -51,15 +51,11 @@ layout: center
 </v-clicks>
 
 <div v-click class="mt-8 text-center text-2xl font-bold text-blue-500">
-At this scale, we need a complementary approach: declarative construction.
+At this scale, we need something different.
 </div>
 
 <!--
-[痛点讲完后的bridge]
-
-To open the top of the funnel for the ONNX ecosystem, and to make device-targeted optimization easier, we need a way to scalably bring models into ONNX — and provide a stable, uniform representation as the starting point, regardless of the model architecture.
-
-That's what Mobius does.
+配合bullets展开每个痛点。最后一句是transition: 不是export不好，是规模到了这个程度需要另一种方式。
 -->
 
 ---
@@ -77,44 +73,12 @@ That's what Mobius does.
 </v-clicks>
 
 <div v-click class="mt-8 p-4 bg-blue-50 rounded-lg text-center text-xl">
-💡 We don't just need a better exporter. We need <strong>one canonical construction</strong> per architecture.
+💡 We need <strong>one canonical construction</strong> per architecture.
 </div>
 
----
-
-# From Curated to Community Scale
-
-<div class="mt-4 text-lg">
-
-Today we can build ~10 curated text generation and MoE models.<br>
-But the HuggingFace ecosystem has **thousands** across every modality.
-
-</div>
-
-<v-click>
-
-<div class="mt-6 text-center text-2xl font-bold text-blue-500">
-How do we scale to the entire HuggingFace ecosystem?
-</div>
-
-</v-click>
-
----
-
-# The Scale: Visualized
-
-<ScaleAnimation />
-
----
-layout: center
-class: text-center
----
-
-# The Answer: AI-Native Architecture
-
-<div class="text-2xl text-gray-500 mt-4">
-Design the system so AI agents can reliably add models.
-</div>
+<!--
+从"export难"升维到"碎片化才是根因"。不是某个exporter的问题，是整个模式导致的——每个人各做各的，没有统一标准。
+-->
 
 ---
 
@@ -143,7 +107,7 @@ Model-dependent. Hard to standardize.
 
 <div class="border-2 border-green-300 rounded-lg p-4">
 
-### ✅ Construction (Mobius)
+### ✅ Construction
 
 ```
 HuggingFace Config
@@ -159,6 +123,66 @@ Deterministic. Composable.
 </div>
 
 </div>
+
+<!--
+这里口头提Model Builder: "This idea isn't new — ORT GenAI Model Builder pioneered it and proved it works."
+
+Construction不是否定export，是complementary。Export是general purpose翻译，Construction是standardization at scale。
+-->
+
+---
+
+# From Curated to Community Scale
+
+<div class="mt-4 text-lg">
+
+Today we can build ~10 curated text generation and MoE models.<br>
+But the HuggingFace ecosystem has **thousands** across every modality.
+
+</div>
+
+<v-click>
+
+<div class="mt-6 text-center text-2xl font-bold text-blue-500">
+How do we scale construction to the entire ecosystem?
+</div>
+
+</v-click>
+
+<!--
+Construction方向对了，但人手不够。10个curated模型用人工可以，thousands across 8+ modalities不行。观众现在理解了construction是什么，接下来的动画才有context。
+-->
+
+---
+
+# The Scale: Visualized
+
+<ScaleAnimation />
+
+<!--
+点击walk through动画。Phase 0: 现状~10个(text gen + MoE)。Phase 1: zoom out看到8个modality的完整版图。Phase 2: 亮起来——"With Mobius, we can scale across all of them."
+
+停顿让观众消化。
+-->
+
+---
+layout: center
+class: text-center
+---
+
+# The Answer
+
+<div class="text-2xl text-gray-500 mt-4">
+Design construction for AI — from the ground up.
+</div>
+
+<!--
+一句话把construction和AI绑在一起。不是"先做个build工具，再加AI"，是"从第一天开始就为AI agent开发而设计"。
+
+To open the top of the funnel for the ONNX ecosystem, and to make device-targeted optimization easier, we need a way to scalably bring models into ONNX — and provide a stable, uniform representation as the starting point, regardless of model architecture.
+
+That's what Mobius does.
+-->
 
 ---
 
