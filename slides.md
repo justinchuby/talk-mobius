@@ -4,6 +4,7 @@ title: "Mobius: AI-Native ONNX Model Construction"
 info: |
   Justin Chu · Microsoft AI Frameworks
 class: text-center
+routerMode: hash
 drawings:
   persist: false
 transition: slide-left
