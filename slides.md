@@ -2,7 +2,6 @@
 theme: default
 title: "Mobius: AI-Native ONNX Model Construction"
 info: |
-  ONNX Meetup — June 2025
   Justin Chu · Microsoft AI Frameworks
 class: text-center
 drawings:
@@ -13,7 +12,7 @@ mdc: true
 
 # Mobius
 
-## Build ONNX Models, Don't Export Them
+## Standardized ONNX Construction for GenAI at Scale
 
 <div class="pt-6">
   <span class="text-xl text-gray-500">
@@ -21,11 +20,11 @@ mdc: true
   </span>
 </div>
 
-<div class="abs-br m-6 flex gap-2">
-  <a href="https://github.com/onnxruntime/mobius" target="_blank" class="text-xl slidev-icon-btn">
-    <carbon-logo-github />
-  </a>
-</div>
+<!--
+At Microsoft, we use ONNX in two roles: as the starting point for optimizing AI models to run on devices, and as the format we deliver those optimized models in.
+
+As a maintainer of the PyTorch to ONNX exporter — I share your pain. Model exporting is still hard.
+-->
 
 ---
 layout: center
@@ -33,9 +32,13 @@ layout: center
 
 # The Problem
 
+<!--
+[翻到这页时不用说太多，visual break。下一页的bullet points会展开痛点。]
+-->
+
 ---
 
-# Export Is Hard
+# The Challenge at Scale
 
 <v-clicks>
 
@@ -43,23 +46,85 @@ layout: center
 - 🔥 **Unsupported ops** — custom ops, control flow, Python-only logic
 - 🔥 **Opset compatibility** — your model needs op18 but runtime supports op17
 - 🔥 **Numerical drift** — "it exported but outputs are wrong"
-- 🔥 **Models ship faster than we can export them** — 130+ architectures and counting
+- 🔥 **Models ship faster than anyone can keep up** — 130+ architectures and counting
 
 </v-clicks>
 
 <div v-click class="mt-8 text-center text-2xl font-bold text-blue-500">
-What if we stopped translating and started building?
+At this scale, we need a complementary approach: declarative construction.
+</div>
+
+<!--
+[痛点讲完后的bridge]
+
+To open the top of the funnel for the ONNX ecosystem, and to make device-targeted optimization easier, we need a way to scalably bring models into ONNX — and provide a stable, uniform representation as the starting point, regardless of the model architecture.
+
+That's what Mobius does.
+-->
+
+---
+
+# The Deeper Problem: Fragmentation
+
+<v-clicks>
+
+- 🧩 **No single source of truth** — same model, different ONNX graphs depending on who exported it
+- 🧩 **Structural inconsistency** — CUDA export ≠ WebGPU export ≠ DirectML export
+- 🧩 **Quality variance** — some exports work, some silently produce wrong outputs
+- 🧩 **Duplicated effort** — every team re-discovers the same export pitfalls
+- 🧩 **No composability** — can't share components across models when each is a one-off translation
+
+</v-clicks>
+
+<div v-click class="mt-8 p-4 bg-blue-50 rounded-lg text-center text-xl">
+💡 We don't just need a better exporter. We need <strong>one canonical construction</strong> per architecture.
 </div>
 
 ---
 
-# The Paradigm Shift
+# From Curated to Community Scale
+
+<div class="mt-4 text-lg">
+
+Today we can build ~10 curated text generation and MoE models.<br>
+But the HuggingFace ecosystem has **thousands** across every modality.
+
+</div>
+
+<v-click>
+
+<div class="mt-6 text-center text-2xl font-bold text-blue-500">
+How do we scale to the entire HuggingFace ecosystem?
+</div>
+
+</v-click>
+
+---
+
+# The Scale: Visualized
+
+<ScaleAnimation />
+
+---
+layout: center
+class: text-center
+---
+
+# The Answer: AI-Native Architecture
+
+<div class="text-2xl text-gray-500 mt-4">
+Design the system so AI agents can reliably add models.
+</div>
+
+---
+
+# The Paradigm: Construction
 
 <div class="grid grid-cols-2 gap-8 mt-8">
 
-<div class="border-2 border-red-300 rounded-lg p-4">
+<div class="border-2 border-gray-300 rounded-lg p-4">
 
-### ❌ Translation (Export)
+### Translation (Export)
 
 ```
 PyTorch Model
@@ -68,10 +133,11 @@ Intermediate Repr
     ↓ convert ops
 ONNX Graph
     ↓ fix shapes
-ONNX Model (fingers crossed)
+ONNX Model
 ```
 
-Fragile. Lossy. Model-dependent.
+Great for general purpose.
+Model-dependent. Hard to standardize.
 
 </div>
 
@@ -84,10 +150,11 @@ HuggingFace Config
     ↓ read architecture
 ONNX Graph (declarative)
     ↓ apply weights
-ONNX Model (correct by design)
+ONNX Model
 ```
 
-Deterministic. Complete. Composable.
+Deterministic. Composable.
+**One canonical output per architecture.**
 
 </div>
 
@@ -188,46 +255,70 @@ class Linear(nn.Module):
 </v-clicks>
 
 ---
+
+# Designed for Parallel Development
+
+<div class="mt-4 text-lg">
+
+The architecture is **designed for parallel AI agent development**.
+
+</div>
+
+<v-clicks>
+
+- 📁 **One model = one file** — no cross-model dependencies
+- 🧩 **Shared components are stable** — compose from them, rarely need to change them
+- 🧪 **Independent test suites** — each model validates in isolation
+- 📚 **18 structured skills** — agents follow the same playbook humans would
+- 📋 **Declarative golden tests** — adding coverage = adding a YAML file
+
+</v-clicks>
+
+---
+
+# EP-Aware Optimization
+
+```python
+from mobius import build
+
+# CUDA: GQA fusion, SkipLayerNorm, PackQKV
+pkg = build("meta-llama/Llama-3.2-1B",
+            execution_provider="cuda", dtype="f16")
+
+# WebGPU: portable alternatives, no CUDA-only ops
+pkg = build("meta-llama/Llama-3.2-1B",
+            execution_provider="webgpu", dtype="f16")
+
+# DirectML: Windows-optimized graph
+pkg = build("meta-llama/Llama-3.2-1B",
+            execution_provider="dml", dtype="f16")
+```
+
+<v-click>
+
+Optimization happens **at build time**, not post-hoc. The graph is born ready for its target runtime.
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 text-sm text-gray-500">
+
+🔧 Under the hood: **10 declarative rewrite rules** (GQA fusion, SkipLayerNorm, BiasGeLU, PackedAttention, RoPE separation...) pattern-match and transform the graph — like LLVM passes for ONNX.
+
+</div>
+
+</v-click>
+
+---
 layout: center
 class: text-center
 ---
 
-# The AI Story
+# How AI Agents Use Mobius
 
 <div class="text-2xl text-gray-500 mt-4">
-This project can't exist without AI agents.
-</div>
-
----
-
-# The Scale Problem
-
-<div class="grid grid-cols-2 gap-8 mt-8">
-
-<div>
-
-### Models ship fast
-
-- 130+ architectures today
-- New ones every week
-- Variants, MoE, multimodal, hybrid...
-
-</div>
-
-<div>
-
-### Humans don't scale
-
-- Each model: read paper, impl, test, debug
-- 2-5 days per model (manual)
-- Team of ~5 contributors
-
-</div>
-
-</div>
-
-<div v-click class="mt-8 p-4 bg-blue-50 rounded-lg text-center text-xl">
-💡 Solution: Design the system so AI agents can reliably add models
+The skills, the workflow, the verification.
 </div>
 
 ---
@@ -240,22 +331,17 @@ This project can't exist without AI agents.
 
 </div>
 
-```
-┌─────────────────────────────────────┐
-│     adding-a-new-model              │  ← Master recipe
-│  (step-by-step, checklist)          │
-└─────────────────┬───────────────────┘
-                  │
-    ┌─────────────┼─────────────────┐
-    │             │                 │
-    ▼             ▼                 ▼
-reusable      weight-name       writing-tests
-components    alignment         (L1-L5 patterns)
-    │             │                 │
-    ▼             ▼                 ▼
-multimodal    quality-         debugging-*
-moe-models    checklist        profiling
-diffusion     (Def of Done)    ort-genai-config
+```mermaid
+graph TD
+    Master[adding-a-new-model<br/><i>Master recipe</i>] --> RC[reusable-components]
+    Master --> WN[weight-name-alignment]
+    Master --> WT[writing-tests<br/><i>L1-L5 patterns</i>]
+    RC --> MM[multimodal-models]
+    RC --> MoE[moe-models]
+    RC --> Diff[diffusion-models]
+    WN --> QC[quality-checklist<br/><i>Def of Done</i>]
+    WT --> Debug[debugging-*<br/>profiling]
+    WT --> ORT[ort-genai-config]
 ```
 
 ---
@@ -320,50 +406,82 @@ How agents (and humans) verify correctness:
 
 The agent doesn't just run tests — it **knows what a failure means** and can fix it.
 
-### Result: most models are added in 1–2 days
+</v-clicks>
 
-(Including test generation, weight mapping, and L1-L5 validation.  
-Multiple models run **in parallel** → team throughput stays high.)
+---
+
+# Case Study: PersonaPlex
+
+<div class="mt-4 text-lg">
+
+An **audio-to-audio** model. Not text gen. Not vision. Something ONNX has rarely seen.
+
+</div>
+
+<v-clicks>
+
+### The model
+
+- NVIDIA's real-time full-duplex voice conversation model
+- 7B parameters, Moshi architecture
+- Audio in → Audio out (no STT→LLM→TTS pipeline)
+- Full-duplex: both sides talk simultaneously, natural interruption
+
+### What happened
+
+- AI agent picked it up, classified it as novel (out-of-library)
+- Composed new audio components + reused existing attention/norm building blocks
+- Built end-to-end ONNX graph + streaming inference server
+- **2–3 days**, fully tested, working demo
 
 </v-clicks>
 
+<div v-click class="mt-4 p-3 bg-green-50 rounded-lg text-center">
 
+🎵 The system doesn't just handle <em>more text models</em>. It handles <strong>new modalities</strong> the same way.
+
+</div>
 
 ---
 
-# EP-Aware Optimization
+# Out-of-Tree Models
+
+<div class="mt-4 text-lg">
+
+Third parties can build their private models with Mobius — and get the same optimized path for free.
+
+</div>
 
 ```python
-from mobius import build
+from mobius import registry
+from mobius.components import Attention, RMSNorm, MLP, RotaryEmbedding
 
-# CUDA: GQA fusion, SkipLayerNorm, PackQKV
-pkg = build("meta-llama/Llama-3.2-1B",
-            execution_provider="cuda", dtype="f16")
+class MyProprietaryModel(CausalLMModel):
+    # Compose from 56+ battle-tested components
+    def __init__(self, config):
+        self.attn = Attention(config)      # ← same as Llama/Qwen
+        self.norm = RMSNorm(config)        # ← same as Gemma
+        self.mlp = MLP(config)             # ← same as Phi
+        self.rope = RotaryEmbedding(config)
 
-# WebGPU: portable alternatives, no CUDA-only ops
-pkg = build("meta-llama/Llama-3.2-1B",
-            execution_provider="webgpu", dtype="f16")
-
-# DirectML: Windows-optimized graph
-pkg = build("meta-llama/Llama-3.2-1B",
-            execution_provider="dml", dtype="f16")
+registry.register("my_secret_model", MyProprietaryModel)
 ```
 
-<v-click>
+<v-clicks>
 
-Optimization happens **at build time**, not post-hoc. The graph is born ready for its target runtime.
+- 🔧 **Reusable components** — don't reinvent Attention/MLP/RoPE, just compose
+- ⚡ **EP optimizations come free** — GQA fusion, SkipLayerNorm, etc. apply automatically
+- 🔒 **Keep weights private** — only the architecture definition is needed at build time
+- 📦 **Any weight format** — SafeTensors, PyTorch `.bin`, GGUF, NeMo → one canonical ONNX
+- 🧪 **Same L1-L5 test infra** — validate your model with the same pipeline we use
 
-</v-click>
+</v-clicks>
 
----
-layout: center
----
+<div v-click class="mt-6 p-3 bg-blue-50 rounded-lg text-center">
 
-# Demo
+🔄 <strong>Flywheel:</strong> Third parties use components → find bugs, add ops → components get better → more models adopt them → repeat.
 
-```bash
-mobius build --model Qwen/Qwen2.5-0.5B output/ --ep cuda --dtype f16
-```
+</div>
 
 ---
 
@@ -387,7 +505,7 @@ mobius build --model Qwen/Qwen2.5-0.5B output/ --ep cuda --dtype f16
 | Category | Examples |
 |----------|---------|
 | **Enc-Dec** | T5, BART, Whisper, Marian |
-| **Audio** | Wav2Vec2, HuBERT, SpeechT5 |
+| **Audio** | Wav2Vec2, HuBERT, SpeechT5, PersonaPlex |
 | **Vision** | ViT, CLIP, SigLIP, DINOv2 |
 | **Diffusion** | Stable Diffusion, Flux, SD3, DiT |
 
@@ -405,7 +523,7 @@ mobius build --model Qwen/Qwen2.5-0.5B output/ --ep cuda --dtype f16
 
 <v-clicks>
 
-1. **Build, don't export** — declarative ONNX construction eliminates export fragility
+1. **Build for standardization** — declarative ONNX construction, one canonical output per architecture
 2. **Memory efficient** — shape-only params + LazyTensor = build any model size
 3. **AI-native** — 18 skills + L1-L5 testing let agents add models autonomously
 4. **EP-aware** — born optimized for your target runtime
@@ -413,17 +531,9 @@ mobius build --model Qwen/Qwen2.5-0.5B output/ --ep cuda --dtype f16
 
 </v-clicks>
 
-<div v-click class="mt-8 text-center">
+<div v-click class="mt-8 text-center text-xl">
 
-### Get started
-
-```bash
-pip install mobius
-mobius build --model <any-hf-model> output/
-```
-
-📖 [onnxruntime.github.io/mobius](https://onnxruntime.github.io/mobius/)
-· 💻 [github.com/onnxruntime/mobius](https://github.com/onnxruntime/mobius)
+Coming this summer. Pairs with Olive for end-to-end optimization.
 
 </div>
 
