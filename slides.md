@@ -244,7 +244,7 @@ pkg.save("output/gemma-4-12b/")
 
 - 📦 **130+** Transformers model types
 - 🎯 **56+** reusable components
-- 🖥️ **EP-aware** optimization (CUDA, WebGPU, XPU)
+- 🖥️ **Customizable** graph tweaks (CUDA, WebGPU, XPU)
 - 🧠 **Memory efficient** — builds models in <1x RAM
 
 </v-clicks>
@@ -388,62 +388,6 @@ The architecture is **designed for parallel AI agent development**.
 The architecture isn't just clean — it's deliberately shaped so many agents (or people) can work at once without colliding. One model lives in one file with no cross-model imports, so two models never conflict. Shared components are stable, so you compose from them instead of editing them. Tests are per-model and isolated. And the skills plus declarative golden tests mean an agent follows the same playbook a human would.
 -->
 
----
-
-# EP-Aware Optimization
-
-```python
-from mobius import build
-
-# CUDA: GQA fusion, SkipLayerNorm, PackQKV
-pkg = build("google/gemma-4-12B-it",
-            execution_provider="cuda", dtype="f16")
-
-# WebGPU: portable alternatives, no CUDA-only ops
-pkg = build("google/gemma-4-12B-it",
-            execution_provider="webgpu", dtype="f16")
-
-# ONNX standard ops only model
-pkg = build("google/gemma-4-12B-it",
-            execution_provider="onnx-standard", dtype="f16")
-```
-
-
-<v-click>
-
-<div class="mt-4 text-sm text-gray-500">
-
-🔧 Under the hood: **10 declarative rewrite rules** (GQA fusion, SkipLayerNorm, BiasGeLU, PackedAttention, RoPE separation...) pattern-match and transform the graph.
-
-</div>
-
-</v-click>
-
-<v-click>
-
-<div class="mt-3 text-sm text-gray-500">
-
-⚙️ **Bring your own EP** — `register_ep(EpCapabilities(...))` adds a target without forking: control GQA/QKV fusion, lowering passes, RoPE, MoE support, KV-cache caps.
-
-</div>
-
-</v-click>
-
-<!--
-- Same model ID, same one-line API — only the target changes
-- CUDA: GQA fusion, SkipLayerNorm, PackQKV
-- WebGPU: portable alternatives, no CUDA-only ops
-- DirectML: Windows-optimized graph
-- Optimization at build time, not a fragile post-hoc pass
-- Under the hood: 10 declarative rewrite rules — like LLVM passes for ONNX; graph born ready for its target
-- EP support is extensible: register_ep(EpCapabilities(...)) — not hard-coded, vendors/teams can add their own
-
-Same model ID, same one-line API — the only thing that changes is the target. Pass execution_provider and you get a graph tuned for that runtime: CUDA gets GQA fusion, SkipLayerNorm, PackQKV; WebGPU swaps in portable alternatives with no CUDA-only ops; DirectML gets a Windows-optimized graph.
-
-The important framing: optimization happens at build time, not as a fragile post-hoc pass over an exported model. Under the hood it's 10 declarative rewrite rules that pattern-match and rewrite subgraphs — conceptually LLVM passes for ONNX. The graph is born ready for its target.
-
-And EP support isn't hard-coded — register_ep(EpCapabilities(...)) lets a vendor or internal team add a new target with its own fusion/lowering behavior, without forking Mobius.
--->
 
 ---
 layout: center
@@ -742,8 +686,7 @@ The bottom line is the headline number: 130+ model types, 56+ shared components,
 1. **Build for standardization** — declarative ONNX construction, one canonical output per architecture
 2. **Memory efficient** — shape-only params + LazyTensor = build any model size
 3. **AI-native** — 18 skills + L1-L5 testing let agents add models autonomously
-4. **EP-aware** — born optimized for your target runtime
-5. **Composable** — 56+ components shared across 130+ architectures
+4. **Composable** — 56+ components shared across 130+ architectures
 
 </v-clicks>
 
@@ -757,11 +700,10 @@ Coming this summer. Offered in Olive for end-to-end optimization.
 - Build for standardization, not translation — one canonical output per architecture
 - Memory efficient: shape-only params + LazyTensor → any model size
 - AI-native: skills + L1–L5 → agents add models autonomously
-- EP-aware: born optimized for the target runtime
 - Composable: 56+ components across 130+ architectures
 - Availability: coming this summer; pairs with Olive for end-to-end optimization
 
-Five takeaways, one per click. Build for standardization, not translation. Memory efficiency makes any model size buildable. AI-native means agents add models autonomously, backed by skills and L1-L5 testing. EP-aware means born optimized for the target runtime. And composability ties it together — 56+ components across 130+ architectures.
+Five takeaways, one per click. Build for standardization, not translation. Memory efficiency makes any model size buildable. AI-native means agents add models autonomously, backed by skills and L1-L5 testing. Composability ties it together — 56+ components across 130+ architectures.
 
 Close on availability: coming this summer, and it pairs with Olive for the end-to-end optimization story.
 -->
