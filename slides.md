@@ -88,17 +88,32 @@ Now, to convert these models into ONNX using the Torch exporter, conversion is s
 
 # The Deeper Problem: Fragmentation
 
-<v-clicks>
+<div class="grid grid-cols-4 gap-3 mt-10">
 
-- 🧩 **No single source of truth** — same model, different ONNX graphs depending on who exported it
-- 🧩 **Structural inconsistency** — CUDA export ≠ WebGPU export ≠ CPU export
-- 🧩 **Quality variance** — some exports work, some silently produce wrong outputs
-- 🧩 **Duplicated effort** — every team re-discovers the same export pitfalls
+<div v-click class="border-2 border-gray-300 rounded-lg p-4 text-center">
+<div class="font-bold">No single source of truth</div>
+<div class="mt-2 text-xs text-gray-600">Same model, different ONNX graphs depending on who exported it</div>
+</div>
 
-</v-clicks>
+<div v-click class="border-2 border-gray-300 rounded-lg p-4 text-center">
+<div class="font-bold">Structural inconsistency</div>
+<div class="mt-2 text-xs text-gray-600">CUDA export ≠ WebGPU export ≠ CPU export</div>
+</div>
 
-<div v-click class="mt-8 p-4 bg-blue-50 rounded-lg text-center text-xl">
-💡 We need <strong>one canonical construction</strong> per architecture.
+<div v-click class="border-2 border-gray-300 rounded-lg p-4 text-center">
+<div class="font-bold">Quality variance</div>
+<div class="mt-2 text-xs text-gray-600">Some exports work, some silently produce wrong outputs</div>
+</div>
+
+<div v-click class="border-2 border-gray-300 rounded-lg p-4 text-center">
+<div class="font-bold">Duplicated effort</div>
+<div class="mt-2 text-xs text-gray-600">Every team re-discovers the same export pitfalls</div>
+</div>
+
+</div>
+
+<div v-click class="mt-10 p-4 bg-blue-50 rounded-lg text-center text-xl">
+We need <strong>canonical constructions</strong> for similar model types.
 </div>
 
 <!--
