@@ -413,7 +413,7 @@ pkg = build("google/gemma-4-12B-it",
 
 <div class="mt-4 text-sm text-gray-500">
 
-🔧 Under the hood: **10 declarative rewrite rules** (GQA fusion, SkipLayerNorm, BiasGeLU, PackedAttention, RoPE separation...) pattern-match and transform the graph — like LLVM passes for ONNX.
+🔧 Under the hood: **10 declarative rewrite rules** (GQA fusion, SkipLayerNorm, BiasGeLU, PackedAttention, RoPE separation...) pattern-match and transform the graph.
 
 </div>
 
