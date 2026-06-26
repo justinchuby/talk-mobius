@@ -2,13 +2,13 @@
   <div class="scale-animation" @click="next">
     <div class="phase-label">
       <span v-if="phase === 0">Today: ONNX Runtime Model Builder — ~20 curated architectures</span>
-      <span v-else-if="phase === 1">The full picture: 8 modalities, 130+ architectures</span>
+      <span v-else-if="phase === 1">The full picture: 300+ architectures across 8 modalities</span>
       <span v-else>With Mobius, we can scale across all of them.</span>
     </div>
 
     <div class="grid-wrapper" :class="{ zoomed: phase >= 1 }">
       <!-- Category labels -->
-      <div class="category-row" v-for="cat in categories" :key="cat.name">
+      <div class="category-row" v-for="cat in categories" :key="cat.name" v-show="phase >= 1 || cat.builderNames.length">
         <div class="category-label" :style="{ color: cat.color }">
           {{ cat.icon }} {{ cat.name }}
         </div>
@@ -16,16 +16,15 @@
           <div
             v-for="(cell, i) in cat.cells"
             :key="i"
+            v-show="phase >= 1 || cell.builder"
             class="cell"
             :class="{
               'builder': cell.builder,
-              'mobius': cell.mobius && phase >= 2,
+              'mobius': cell.mobius && !cell.builder && phase >= 2,
               'future': !cell.mobius,
-              'lit': phase >= 2 && cell.mobius
+              'lit': phase >= 2 && cell.mobius && !cell.builder
             }"
             :style="{
-              backgroundColor: phase >= 2 && cell.mobius ? cat.color : undefined,
-              borderColor: phase >= 2 && cell.mobius ? cat.darkColor : undefined,
               animationDelay: cell.mobius ? `${(cell.animIdx % 30) * 80}ms` : '0ms'
             }"
           >
@@ -75,8 +74,8 @@ const categories = [
     icon: '💬',
     color: '#3b82f6',
     darkColor: '#1d4ed8',
-    total: 18,
-    mobiusCount: 14,
+    total: 82,
+    mobiusCount: 36,
     builderNames: ['AMD OLMo', 'ChatGLM', 'ERNIE 4.5', 'Gemma', 'Granite', 'HunYuan', 'InternLM2', 'Llama', 'Mistral', 'Nemotron', 'Phi', 'Qwen', 'SmolLM3'],
   },
   {
@@ -84,8 +83,8 @@ const categories = [
     icon: '🔀',
     color: '#8b5cf6',
     darkColor: '#6d28d9',
-    total: 10,
-    mobiusCount: 6,
+    total: 16,
+    mobiusCount: 9,
     builderNames: ['DeepSeek', 'gpt-oss'],
   },
   {
@@ -93,8 +92,8 @@ const categories = [
     icon: '👁️',
     color: '#ec4899',
     darkColor: '#be185d',
-    total: 10,
-    mobiusCount: 6,
+    total: 46,
+    mobiusCount: 18,
     builderNames: [],
   },
   {
@@ -102,8 +101,8 @@ const categories = [
     icon: '🖼️',
     color: '#f59e0b',
     darkColor: '#d97706',
-    total: 8,
-    mobiusCount: 5,
+    total: 52,
+    mobiusCount: 20,
     builderNames: [],
   },
   {
@@ -111,8 +110,8 @@ const categories = [
     icon: '📝',
     color: '#06b6d4',
     darkColor: '#0891b2',
-    total: 8,
-    mobiusCount: 5,
+    total: 42,
+    mobiusCount: 15,
     builderNames: [],
   },
   {
@@ -120,8 +119,8 @@ const categories = [
     icon: '🔄',
     color: '#14b8a6',
     darkColor: '#0d9488',
-    total: 8,
-    mobiusCount: 5,
+    total: 20,
+    mobiusCount: 9,
     builderNames: ['Whisper'],
   },
   {
@@ -129,8 +128,8 @@ const categories = [
     icon: '🎧',
     color: '#10b981',
     darkColor: '#059669',
-    total: 8,
-    mobiusCount: 5,
+    total: 26,
+    mobiusCount: 11,
     builderNames: [],
   },
   {
@@ -138,8 +137,8 @@ const categories = [
     icon: '🎨',
     color: '#f43f5e',
     darkColor: '#e11d48',
-    total: 10,
-    mobiusCount: 6,
+    total: 16,
+    mobiusCount: 12,
     builderNames: [],
   },
 ].map((cat) => {
@@ -207,12 +206,14 @@ const categories = [
 
 .category-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
+  max-width: 560px;
   transition: all 0.6s ease;
 }
 
 .zoomed .category-grid {
-  gap: 3px;
+  gap: 2px;
 }
 
 .cell {
@@ -231,13 +232,19 @@ const categories = [
 }
 
 .zoomed .cell {
-  width: 28px;
-  height: 22px;
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
 }
 
 .cell.builder {
   background: #3b82f6;
   border-color: #2563eb;
+}
+
+.cell.mobius {
+  background: #10b981;
+  border-color: #059669;
 }
 
 .zoomed .cell .label {

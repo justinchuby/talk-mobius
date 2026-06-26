@@ -199,20 +199,6 @@ How do we scale construction to the entire ecosystem?
 -->
 
 ---
-
-# The Scale: Visualized
-
-
-<!--
-- Walk the animation: ~20 today → zoom out to 8 modalities → light up "with Mobius, scale across all of them"
-- Pause, let it land
-
-Click to walk through the animation. Phase 0: today, ~20 text-to-text models with Model Builder. Phase 1: zoom out to see the full landscape of 8 modalities. Phase 2: light it up — "With Mobius, we can scale across all of them."
-
-Pause to let the audience absorb it.
--->
-
----
 layout: center
 class: text-center
 ---
