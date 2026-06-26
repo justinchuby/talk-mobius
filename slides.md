@@ -244,7 +244,7 @@ pkg.save("output/gemma-4-12b/")
 
 - 📦 **130+** Transformers model types
 - 🎯 **56+** reusable components
-- 🖥️ **EP-aware** optimization (CUDA, WebGPU, DirectML)
+- 🖥️ **EP-aware** optimization (CUDA, WebGPU, XPU)
 - 🧠 **Memory efficient** — builds 70B models in <100MB RAM
 
 </v-clicks>
