@@ -749,7 +749,7 @@ The bottom line is the headline number: 130+ model types, 56+ shared components,
 
 <div v-click class="mt-8 text-center text-xl">
 
-Coming this summer. Pairs with Olive for end-to-end optimization.
+Coming this summer. Offered in Olive for end-to-end optimization.
 
 </div>
 
