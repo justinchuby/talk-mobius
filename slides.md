@@ -216,9 +216,9 @@ pkg.save("output/llama/")
 </v-clicks>
 
 <!--
-- Mobius = ONNX model definitions for GenAI, written with onnxscript.nn
-- One call: build a HF model ID, save the package — weights downloaded & applied automatically
-- Four proof points, unpacked next: 130+ model types, 56+ components, EP-aware, memory efficient
+This is the payoff slide for the setup. Mobius is ONNX model definitions for GenAI written with the onnxscript.nn API. From the user's side it's one call: build a HuggingFace model ID, save the package. Weights are downloaded and applied automatically.
+
+The four numbers are the proof points we'll unpack next: breadth (130+ Transformers model types), reuse (56+ components), runtime-awareness (EP optimization), and the memory trick that makes huge models buildable on a laptop.
 -->
 
 ---
@@ -238,10 +238,9 @@ graph TD
 ```
 
 <!--
-- HF config → ArchitectureConfig → registry maps model_type → model class
-- Model composed from shared components; Task defines I/O contract (inputs, outputs, KV cache)
-- Weights + EP optimization → final ONNX package
-- Every box is a stable seam — swap a model without touching components
+Walk the pipeline top to bottom. A HuggingFace config comes in and becomes an ArchitectureConfig. The registry maps the model_type string to a model class. That model is composed from shared components. A Task defines the I/O contract — inputs, outputs, KV cache. Then pretrained weights and EP-specific optimization produce the final ONNX package.
+
+The key point: every box is a stable seam. You can swap a model without touching components, or add a task without touching models.
 -->
 
 ---
@@ -266,11 +265,9 @@ registry.register("my_new_model", CausalLMModel)
 </div>
 
 <!--
-- Components: model-agnostic building blocks
-- Models: architecture-specific compositions
-- Tasks: I/O contract + KV cache
-- Registry: HF model_type → class
-- Most models are LLaMA-shaped → one registry line; that's why coverage scales
+These are the same four boxes, but now as the layered abstraction. Components are model-agnostic building blocks. Models are architecture-specific compositions. Tasks own the I/O contract and KV cache behavior. The registry is the lookup from a HuggingFace model_type to the right class.
+
+The punchline is the bottom: many models are LLaMA-shaped, so adding them is literally one registry line. That's why coverage scales — most new models reuse an existing composition.
 -->
 
 ---
@@ -304,10 +301,9 @@ class Linear(nn.Module):
 </v-clicks>
 
 <!--
-- We build a graph, not run a model → params need shape, not data (Linear = zero bytes)
-- Two phases: build full graph with shape-only placeholders (~100MB), then stream weights in lazily
-- ir.LazyTensor defers casts, transposes, tied-weight dedup until serialization
-- Result: 70B model builds in <100MB RAM — on a laptop
+This is the engineering trick that makes construction practical. Because we're building a graph, not running a model, parameters only need their shape, not their data — so a Linear layer allocates zero bytes.
+
+That gives a two-phase build: first construct the full graph with shape-only placeholders (~100MB regardless of model size), then stream weight shards in and attach them lazily. ir.LazyTensor defers casts, transposes, and tied-weight dedup until serialization, so we never hold the whole model in memory. Net result: a 70B model builds in under 100MB of RAM — on a laptop.
 -->
 
 ---
@@ -331,10 +327,44 @@ The architecture is **designed for parallel AI agent development**.
 </v-clicks>
 
 <!--
-- Shaped so many agents (or people) work at once without colliding
-- One model = one file, no cross-model imports → no conflicts
-- Shared components stable → compose, don't edit
-- Per-model isolated tests; skills + golden tests = same playbook a human follows
+The architecture isn't just clean — it's deliberately shaped so many agents (or people) can work at once without colliding. One model lives in one file with no cross-model imports, so two models never conflict. Shared components are stable, so you compose from them instead of editing them. Tests are per-model and isolated. And the skills plus declarative golden tests mean an agent follows the same playbook a human would.
+-->
+
+---
+
+# EP-Aware Optimization
+
+```python
+from mobius import build
+
+# CUDA: GQA fusion, SkipLayerNorm, PackQKV
+pkg = build("meta-llama/Llama-3.2-1B",
+            execution_provider="cuda", dtype="f16")
+
+# WebGPU: portable alternatives, no CUDA-only ops
+pkg = build("meta-llama/Llama-3.2-1B",
+            execution_provider="webgpu", dtype="f16")
+
+# DirectML: Windows-optimized graph
+pkg = build("meta-llama/Llama-3.2-1B",
+            execution_provider="dml", dtype="f16")
+```
+
+
+<v-click>
+
+<div class="mt-4 text-sm text-gray-500">
+
+🔧 Under the hood: **10 declarative rewrite rules** (GQA fusion, SkipLayerNorm, BiasGeLU, PackedAttention, RoPE separation...) pattern-match and transform the graph — like LLVM passes for ONNX.
+
+</div>
+
+</v-click>
+
+<!--
+Same model ID, same one-line API — the only thing that changes is the target. Pass execution_provider and you get a graph tuned for that runtime: CUDA gets GQA fusion, SkipLayerNorm, PackQKV; WebGPU swaps in portable alternatives with no CUDA-only ops; DirectML gets a Windows-optimized graph.
+
+The important framing: optimization happens at build time, not as a fragile post-hoc pass over an exported model. Under the hood it's 10 declarative rewrite rules that pattern-match and rewrite subgraphs — conceptually LLVM passes for ONNX. The graph is born ready for its target.
 -->
 
 ---
@@ -349,8 +379,7 @@ The skills, the workflow, the verification.
 </div>
 
 <!--
-- Now the part that makes it scale: how an agent actually adds a model
-- The skills, the workflow, the verification
+Section divider. We've shown what Mobius is and why the architecture is shaped the way it is. Now the part that makes it scale: how an AI agent actually adds a model — the skills it follows, the workflow it runs, and how it verifies its own work.
 -->
 
 ---
@@ -377,10 +406,9 @@ graph TD
 ```
 
 <!--
-- Skills aren't loose docs — a structured tree the agent navigates
-- adding-a-new-model is the master recipe → components, weight-alignment, tests
-- Branches into multimodal / MoE / diffusion + quality checklist + debugging
-- Agent doesn't improvise — same playbook as an experienced human → consistent, reviewable
+The skills aren't loose docs — they're a structured tree the agent navigates. adding-a-new-model is the master recipe; it branches into reusable-components, weight-name-alignment, and writing-tests. Those in turn lead to specialized skills for multimodal, MoE, and diffusion models, plus quality checklists and debugging/profiling guides.
+
+The point: the agent doesn't improvise. It follows the same documented playbook an experienced human contributor would, which is exactly why agent output is consistent and reviewable.
 -->
 
 ---
@@ -406,10 +434,9 @@ A human designs the system; AI scales it.
 </div>
 
 <!--
-- Read HF config → identify architecture
-- Decide: LLaMA-compatible (one line) or novel (new components)
-- Implement by composing → align weight names → test L1-L5 → iterate to parity
-- None of it works without composable architecture; human designs once, AI scales it
+Walk the six steps as the agent's actual loop. It reads the HF config to identify the architecture, decides whether it's LLaMA-compatible (one line) or genuinely novel (new components), implements by composing, aligns weight names, then tests through L1-L5 and iterates until numerical parity.
+
+Land on the insight at the bottom: none of this works without the composable architecture and consistent patterns. A human designs the system once; the AI scales it across hundreds of models.
 -->
 
 ---
