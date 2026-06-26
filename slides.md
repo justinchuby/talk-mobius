@@ -117,12 +117,10 @@ We need <strong>canonical constructions</strong> for similar model types.
 </div>
 
 <!--
-- Root cause isn't one exporter — it's the pattern: everyone does their own thing, no shared standard
+- No single source of truth, making harder to make assumptions on optimization
 - Leads to longer development time
 - We miss optimization opportunities — models carry patterns the optimizers don't know
-- → need to ensure canonical constructions, avoid fragmentation
-
-Elevate from "export is hard" to "fragmentation is the root cause." It's not any single exporter's problem — it's the whole pattern: everyone does their own thing, with no shared standard.
+- → need a way to ensure canonical constructions, avoid fragmentation
 
 All of this leads to longer development time, and we miss optimization opportunities whenever a model carries patterns the optimizers don't recognize. That's why we need a way to guarantee canonical constructions and avoid fragmentation.
 -->
@@ -172,14 +170,8 @@ Deterministic. Composable.
 </div>
 
 <!--
-- Translation: constrained by modeling code + the PyTorch framework
-- Construction: directly build from what we know about the architecture → the clean ONNX we expect
-- Pioneered by the Model Builder in ONNX Runtime GenAI
-- Complementary, not a replacement: export = general-purpose translation; construction = standardization at scale
-
-- Where translation is constrained by the modeling code and the PyTorch framework, construction goes the other way: we read what we know about the architecture and directly build the clean ONNX representation we expect.
-- This idea isn't new — the Model Builder in ONNX Runtime GenAI pioneered it and proved it works.
-- Construction doesn't negate export — it's complementary. Export is general-purpose translation; Construction is standardization at scale.
+- Whereas we translated the models and were constrained by modeling code and the PyTorch framework, we started to explore directly constructing these models based on what we know about the model architecture and what we expected as the eventual clean ONNX representation.
+- This is the approach pioneered by the Model Builder in ONNX Runtime GenAI
 -->
 
 ---
