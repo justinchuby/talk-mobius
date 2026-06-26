@@ -707,17 +707,17 @@ Close on the flywheel: external users exercise the components, find bugs and add
 </div>
 
 <div class="mt-6 text-center text-2xl font-bold">
-130+ model types · 56+ components · 14 task types
+130+ model types · 56+ components · 40+ task types
 </div>
 
 <!--
 - Breadth across every modality — all through the same construction path
 - PersonaPlex now sits in Audio next to Wav2Vec2 / Whisper
-- Headline: 130+ model types · 56+ components · 14 task types — one canonical construction each
+- Headline: 130+ model types · 56+ components · 40+ task types — one canonical construction each
 
 Don't read the table — let it land visually. The point is breadth across every modality: text gen, MoE, multimodal, encoders, encoder-decoders, audio, vision, and diffusion all go through the same construction path. Note that PersonaPlex now sits in the Audio column alongside Wav2Vec2 and Whisper.
 
-The bottom line is the headline number: 130+ model types, 56+ shared components, 14 task types — one canonical construction each.
+The bottom line is the headline number: 130+ model types, 56+ shared components, 40+ task types — one canonical construction each.
 -->
 
 ---
