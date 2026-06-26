@@ -48,32 +48,27 @@ layout: center
 <div class="grid grid-cols-5 gap-3 mt-10">
 
 <div v-click class="border-2 border-red-200 rounded-lg p-4 text-center bg-red-50">
-<div class="text-3xl">🔥</div>
-<div class="mt-2 font-bold text-red-600">Dynamic shapes</div>
+<div class="font-bold text-red-600">Dynamic shapes</div>
 <div class="mt-2 text-xs text-gray-600">Shapes specialized at runtime, which breaks export</div>
 </div>
 
 <div v-click class="border-2 border-red-200 rounded-lg p-4 text-center bg-red-50">
-<div class="text-3xl">🧩</div>
-<div class="mt-2 font-bold text-red-600">Unsupported operators</div>
+<div class="font-bold text-red-600">Unsupported operators</div>
 <div class="mt-2 text-xs text-gray-600">Control flow, Python-only logic, new PyTorch ops</div>
 </div>
 
 <div v-click class="border-2 border-red-200 rounded-lg p-4 text-center bg-red-50">
-<div class="text-3xl">🪄</div>
-<div class="mt-2 font-bold text-red-600">Graph cleanup & fusion</div>
+<div class="font-bold text-red-600">Graph cleanup & fusion</div>
 <div class="mt-2 text-xs text-gray-600">Patterns shift with <code>transformers</code> / PyTorch, vary across models</div>
 </div>
 
 <div v-click class="border-2 border-red-200 rounded-lg p-4 text-center bg-red-50">
-<div class="text-3xl">🔧</div>
-<div class="mt-2 font-bold text-red-600">Signature / architecture changes</div>
+<div class="font-bold text-red-600">Signature / architecture changes</div>
 <div class="mt-2 text-xs text-gray-600">I/O & tensor-layout tweaks to fit ONNX conventions</div>
 </div>
 
 <div v-click class="border-2 border-red-200 rounded-lg p-4 text-center bg-red-50">
-<div class="text-3xl">📉</div>
-<div class="mt-2 font-bold text-red-600">Quantized models</div>
+<div class="font-bold text-red-600">Quantized models</div>
 <div class="mt-2 text-xs text-gray-600">Low-bit representations have no standard traceable form</div>
 </div>
 
