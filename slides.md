@@ -419,6 +419,16 @@ pkg = build("meta-llama/Llama-3.2-1B",
 
 </v-click>
 
+<v-click>
+
+<div class="mt-3 text-sm text-gray-500">
+
+⚙️ **Bring your own EP** — `register_ep(EpCapabilities(...))` adds a target without forking: control GQA/QKV fusion, lowering passes, RoPE, MoE support, KV-cache caps.
+
+</div>
+
+</v-click>
+
 <!--
 - Same model ID, same one-line API — only the target changes
 - CUDA: GQA fusion, SkipLayerNorm, PackQKV
@@ -426,10 +436,13 @@ pkg = build("meta-llama/Llama-3.2-1B",
 - DirectML: Windows-optimized graph
 - Optimization at build time, not a fragile post-hoc pass
 - Under the hood: 10 declarative rewrite rules — like LLVM passes for ONNX; graph born ready for its target
+- EP support is extensible: register_ep(EpCapabilities(...)) — not hard-coded, vendors/teams can add their own
 
 Same model ID, same one-line API — the only thing that changes is the target. Pass execution_provider and you get a graph tuned for that runtime: CUDA gets GQA fusion, SkipLayerNorm, PackQKV; WebGPU swaps in portable alternatives with no CUDA-only ops; DirectML gets a Windows-optimized graph.
 
 The important framing: optimization happens at build time, not as a fragile post-hoc pass over an exported model. Under the hood it's 10 declarative rewrite rules that pattern-match and rewrite subgraphs — conceptually LLVM passes for ONNX. The graph is born ready for its target.
+
+And EP support isn't hard-coded — register_ep(EpCapabilities(...)) lets a vendor or internal team add a new target with its own fusion/lowering behavior, without forking Mobius.
 -->
 
 ---
