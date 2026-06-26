@@ -212,12 +212,10 @@ Design construction for AI — from the ground up.
 </div>
 
 <!--
-- Our answer: scale using AI agents — design for agentic development from day one
-- Goal: open the top of the funnel for the ONNX ecosystem + make device-targeted optimization easier
+- To open the top of the funnel for the ONNX ecosystem + make device-targeted optimization easier
 - Need to scalably bring models into ONNX + a stable, uniform starting representation, regardless of architecture
+- Our answer: scale using AI agents — design for agentic development from day one
 - That's what Mobius does
-
-One line ties construction and AI together. Our answer: scale using AI agents, and design the system for agentic development from day one. It's not "build a tool first, then add AI" — it's "designed for AI agent development from day one."
 
 To open the top of the funnel for the ONNX ecosystem, and to make device-targeted optimization easier, we need a way to scalably bring models into ONNX — and provide a stable, uniform representation as the starting point, regardless of model architecture.
 
