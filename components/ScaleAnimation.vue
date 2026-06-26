@@ -1,7 +1,7 @@
 <template>
   <div class="scale-animation" @click="next">
     <div class="phase-label">
-      <span v-if="phase === 0">Today: ~10 curated models, text generation and MoE</span>
+      <span v-if="phase === 0">Today: ONNX Runtime Model Builder — ~20 curated architectures</span>
       <span v-else-if="phase === 1">The full picture: 8 modalities, 130+ architectures</span>
       <span v-else>With Mobius, we can scale across all of them.</span>
     </div>
@@ -63,8 +63,11 @@ function next() {
   phase.value = phase.value < 2 ? phase.value + 1 : 0
 }
 
-// Model Builder only covers ~10 text gen models
-const builderModels = ['Llama 2', 'Llama 3', 'Phi-3', 'Phi-4', 'Qwen 2', 'Gemma', 'Mistral', 'GPT-2', 'Phi-3.5', 'Nemotron']
+// Model Builder supported architectures (verified)
+const builderModels = [
+  'AMD OLMo', 'ChatGLM', 'DeepSeek', 'ERNIE 4.5', 'Gemma', 'gpt-oss', 'Granite',
+  'HunYuan', 'InternLM2', 'Llama', 'Mistral', 'Nemotron', 'Phi', 'Qwen', 'SmolLM3', 'Whisper',
+]
 
 const categories = [
   {
@@ -74,7 +77,7 @@ const categories = [
     darkColor: '#1d4ed8',
     total: 18,
     mobiusCount: 14,
-    builderNames: ['Llama 2', 'Llama 3', 'Phi-3', 'Phi-4', 'Qwen 2', 'Gemma', 'Mistral', 'GPT-2'],
+    builderNames: ['AMD OLMo', 'ChatGLM', 'ERNIE 4.5', 'Gemma', 'Granite', 'HunYuan', 'InternLM2', 'Llama', 'Mistral', 'Nemotron', 'Phi', 'Qwen', 'SmolLM3'],
   },
   {
     name: 'MoE',
@@ -83,7 +86,7 @@ const categories = [
     darkColor: '#6d28d9',
     total: 10,
     mobiusCount: 6,
-    builderNames: ['Mixtral', 'Phi-MoE'],
+    builderNames: ['DeepSeek', 'gpt-oss'],
   },
   {
     name: 'Multimodal',
@@ -119,7 +122,7 @@ const categories = [
     darkColor: '#0d9488',
     total: 8,
     mobiusCount: 5,
-    builderNames: [],
+    builderNames: ['Whisper'],
   },
   {
     name: 'Audio',
