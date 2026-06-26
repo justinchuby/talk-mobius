@@ -264,7 +264,7 @@ The four numbers are the proof points we'll unpack next: breadth (130+ Transform
 # Architecture
 
 ```mermaid
-graph TD
+graph LR
     HF[HuggingFace Hub] --> Config[ArchitectureConfig]
     Config --> Registry[Registry: model_type → class]
     Registry --> Model[Model Module]
@@ -604,7 +604,6 @@ An **audio-to-audio** model. Not text gen. Not vision. Something ONNX has rarely
 - AI agent picked it up, classified it as novel (out-of-library)
 - Composed new audio components + reused existing attention/norm building blocks
 - Built end-to-end ONNX graph + streaming inference server
-- **2–3 days**, fully tested, working demo
 
 </v-clicks>
 
@@ -618,7 +617,7 @@ An **audio-to-audio** model. Not text gen. Not vision. Something ONNX has rarely
 - Proof it generalizes beyond text — audio-to-audio
 - NVIDIA full-duplex voice, Moshi architecture, 7B, audio in → audio out, no STT-LLM-TTS pipeline; ONNX rarely sees this
 - Agent: classified novel → composed new audio components, reused attention/norm → end-to-end graph + streaming server
-- 2–3 days, fully tested → new modality, same workflow as the hundredth text model
+- 2 days, fully tested → new modality, same workflow as the hundredth text model
 
 This is the proof that the approach generalizes beyond text. PersonaPlex is audio-to-audio — NVIDIA's full-duplex voice model on the Moshi architecture, 7B params, audio in and audio out, no STT-LLM-TTS pipeline. It's exactly the kind of thing ONNX rarely sees.
 
@@ -689,7 +688,7 @@ Close on the flywheel: external users exercise the components, find bugs and add
 |----------|---------|
 | **Text Gen** | Llama 2/3/4, Qwen 2-3.6, Phi, Gemma, GPT-2 |
 | **MoE** | DeepSeek-V2/V3, Mixtral, Qwen-MoE, DBRX |
-| **Multimodal** | Gemma 3, Phi-4MM, Qwen-VL, LLaVA |
+| **Multimodal** | Gemma 4, Phi-4MM, Qwen-VL, LLaVA |
 | **Encoder** | BERT, RoBERTa, DeBERTa, XLNet |
 
 </div>
@@ -699,7 +698,7 @@ Close on the flywheel: external users exercise the components, find bugs and add
 | Category | Examples |
 |----------|---------|
 | **Enc-Dec** | T5, BART, Whisper, Marian |
-| **Audio** | Wav2Vec2, HuBERT, SpeechT5, PersonaPlex |
+| **Audio** | Wav2Vec2, Nemotron, SpeechT5, PersonaPlex |
 | **Vision** | ViT, CLIP, SigLIP, DINOv2 |
 | **Diffusion** | Stable Diffusion, Flux, SD3, DiT |
 
