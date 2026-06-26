@@ -26,7 +26,7 @@ Hi, I am Justin, a software engineer at Microsoft working on our inference and o
 
 At Microsoft, we use ONNX as both the starting point for optimizing AI models, and as the format we deliver those optimized models in.
 
-To acquire those ONNX models, we have been relying on the PyTorch exporter to trace the model architecture and convert the operators into ONNX — typically starting from models on Hugging Face. As a maintainer of that exporter, I share your pain: model exporting is still hard.
+To acquire ONNX models, we have been relying on the PyTorch exporter to trace the model architecture and convert the operators into ONNX — typically starting from models on Hugging Face. You may have experience the pain of exporting a model from PyTorch. As a maintainer of the exporter, I share your pain: model exporting is still hard.
 -->
 
 ---
@@ -36,6 +36,8 @@ layout: center
 # The Problem
 
 <!--
+- Visual break — pain points unpack on the next slide
+
 [Visual break. The bullets on the next slide unpack the pain points.]
 -->
 
@@ -58,6 +60,14 @@ At this scale, we need something different.
 </div>
 
 <!--
+- Converting a HF model to ONNX with the Torch exporter — every one of these can bite you
+- Dynamic shapes: shapes specialized at runtime → breaks export
+- Unsupported operators: control flow, Python-only logic, new PyTorch ops
+- Graph cleanup & fusion: patterns shift with transformers / PyTorch, vary per model
+- Signature/architecture changes: I/O & tensor-layout tweaks to fit ONNX conventions
+- Quantized models: low-bit has no standard traceable form
+- Transition: not that export is bad — at this scale & churn, we need something different
+
 Walk through each pain point with the bullets. To convert a Hugging Face model into ONNX with the Torch exporter, every one of these can bite you. The last line is the transition: it's not that export is bad — it's that at this scale, with this much churn, we need a different approach.
 -->
 
@@ -79,6 +89,11 @@ Walk through each pain point with the bullets. To convert a Hugging Face model i
 </div>
 
 <!--
+- Root cause isn't one exporter — it's the pattern: everyone does their own thing, no shared standard
+- Leads to longer development time
+- We miss optimization opportunities — models carry patterns the optimizers don't know
+- → need to ensure canonical constructions, avoid fragmentation
+
 Elevate from "export is hard" to "fragmentation is the root cause." It's not any single exporter's problem — it's the whole pattern: everyone does their own thing, with no shared standard.
 
 All of this leads to longer development time, and we miss optimization opportunities whenever a model carries patterns the optimizers don't recognize. That's why we need a way to guarantee canonical constructions and avoid fragmentation.
@@ -129,6 +144,11 @@ Deterministic. Composable.
 </div>
 
 <!--
+- Translation: constrained by modeling code + the PyTorch framework
+- Construction: directly build from what we know about the architecture → the clean ONNX we expect
+- Pioneered by the Model Builder in ONNX Runtime GenAI
+- Complementary, not a replacement: export = general-purpose translation; construction = standardization at scale
+
 - Where translation is constrained by the modeling code and the PyTorch framework, construction goes the other way: we read what we know about the architecture and directly build the clean ONNX representation we expect.
 - This idea isn't new — the Model Builder in ONNX Runtime GenAI pioneered it and proved it works.
 - Construction doesn't negate export — it's complementary. Export is general-purpose translation; Construction is standardization at scale.
@@ -154,6 +174,10 @@ How do we scale construction to the entire ecosystem?
 </v-click>
 
 <!--
+- Model Builder: ~20 text-to-text architectures, done by hand
+- HF ecosystem: 300+ model types across every modality — can't do that manually
+- Question: how do we scale construction to the whole ecosystem?
+
 Construction is the right direction, but there aren't enough hands. ~20 curated text-to-text models can be done manually; 300+ model types across 8+ modalities cannot. The audience now understands what construction is, which gives the upcoming animation its context.
 -->
 
@@ -164,6 +188,9 @@ Construction is the right direction, but there aren't enough hands. ~20 curated 
 <ScaleAnimation />
 
 <!--
+- Walk the animation: ~20 today → zoom out to 8 modalities → light up "with Mobius, scale across all of them"
+- Pause, let it land
+
 Click to walk through the animation. Phase 0: today, ~20 text-to-text models with Model Builder. Phase 1: zoom out to see the full landscape of 8 modalities. Phase 2: light it up — "With Mobius, we can scale across all of them."
 
 Pause to let the audience absorb it.
@@ -181,6 +208,11 @@ Design construction for AI — from the ground up.
 </div>
 
 <!--
+- Our answer: scale using AI agents — design for agentic development from day one
+- Goal: open the top of the funnel for the ONNX ecosystem + make device-targeted optimization easier
+- Need to scalably bring models into ONNX + a stable, uniform starting representation, regardless of architecture
+- That's what Mobius does
+
 One line ties construction and AI together. Our answer: scale using AI agents, and design the system for agentic development from day one. It's not "build a tool first, then add AI" — it's "designed for AI agent development from day one."
 
 To open the top of the funnel for the ONNX ecosystem, and to make device-targeted optimization easier, we need a way to scalably bring models into ONNX — and provide a stable, uniform representation as the starting point, regardless of model architecture.
@@ -216,6 +248,10 @@ pkg.save("output/llama/")
 </v-clicks>
 
 <!--
+- Mobius = ONNX model definitions for GenAI, built with the onnxscript.nn API
+- One call: build a HF model ID → save the package; weights downloaded & applied automatically
+- Four proof points (unpack next): breadth (130+ types), reuse (56+ components), EP-aware, memory trick
+
 This is the payoff slide for the setup. Mobius is ONNX model definitions for GenAI written with the onnxscript.nn API. From the user's side it's one call: build a HuggingFace model ID, save the package. Weights are downloaded and applied automatically.
 
 The four numbers are the proof points we'll unpack next: breadth (130+ Transformers model types), reuse (56+ components), runtime-awareness (EP optimization), and the memory trick that makes huge models buildable on a laptop.
@@ -238,6 +274,9 @@ graph TD
 ```
 
 <!--
+- Pipeline top→bottom: HF config → ArchitectureConfig → registry (model_type → class) → model from components → Task (I/O contract, KV cache) → weights + EP optimization → ONNX package
+- Every box is a stable seam: swap a model without touching components; add a task without touching models
+
 Walk the pipeline top to bottom. A HuggingFace config comes in and becomes an ArchitectureConfig. The registry maps the model_type string to a model class. That model is composed from shared components. A Task defines the I/O contract — inputs, outputs, KV cache. Then pretrained weights and EP-specific optimization produce the final ONNX package.
 
 The key point: every box is a stable seam. You can swap a model without touching components, or add a task without touching models.
@@ -265,6 +304,12 @@ registry.register("my_new_model", CausalLMModel)
 </div>
 
 <!--
+- Components: model-agnostic building blocks
+- Models: architecture-specific compositions
+- Tasks: own the I/O contract + KV cache
+- Registry: HF model_type → class
+- Punchline: many models are LLaMA-shaped → adding them is one registry line; that's why coverage scales
+
 These are the same four boxes, but now as the layered abstraction. Components are model-agnostic building blocks. Models are architecture-specific compositions. Tasks own the I/O contract and KV cache behavior. The registry is the lookup from a HuggingFace model_type to the right class.
 
 The punchline is the bottom: many models are LLaMA-shaped, so adding them is literally one registry line. That's why coverage scales — most new models reuse an existing composition.
@@ -301,6 +346,11 @@ class Linear(nn.Module):
 </v-clicks>
 
 <!--
+- Trick: we build a graph, not run a model → params need shape, not data → Linear allocates zero bytes
+- Two-phase: full graph with shape-only placeholders (~100MB, any size) → stream weight shards, attach lazily
+- ir.LazyTensor defers casts / transposes / tied-weight dedup until serialization → never hold the whole model
+- Result: 70B builds in <100MB RAM — on a laptop
+
 This is the engineering trick that makes construction practical. Because we're building a graph, not running a model, parameters only need their shape, not their data — so a Linear layer allocates zero bytes.
 
 That gives a two-phase build: first construct the full graph with shape-only placeholders (~100MB regardless of model size), then stream weight shards in and attach them lazily. ir.LazyTensor defers casts, transposes, and tied-weight dedup until serialization, so we never hold the whole model in memory. Net result: a 70B model builds in under 100MB of RAM — on a laptop.
@@ -327,6 +377,12 @@ The architecture is **designed for parallel AI agent development**.
 </v-clicks>
 
 <!--
+- Shaped so many agents (or people) work at once without colliding
+- One model = one file, no cross-model imports → no conflicts
+- Shared components stable → compose, don't edit
+- Per-model isolated tests
+- Skills + declarative golden tests → agents follow the same playbook a human would
+
 The architecture isn't just clean — it's deliberately shaped so many agents (or people) can work at once without colliding. One model lives in one file with no cross-model imports, so two models never conflict. Shared components are stable, so you compose from them instead of editing them. Tests are per-model and isolated. And the skills plus declarative golden tests mean an agent follows the same playbook a human would.
 -->
 
@@ -362,6 +418,13 @@ pkg = build("meta-llama/Llama-3.2-1B",
 </v-click>
 
 <!--
+- Same model ID, same one-line API — only the target changes
+- CUDA: GQA fusion, SkipLayerNorm, PackQKV
+- WebGPU: portable alternatives, no CUDA-only ops
+- DirectML: Windows-optimized graph
+- Optimization at build time, not a fragile post-hoc pass
+- Under the hood: 10 declarative rewrite rules — like LLVM passes for ONNX; graph born ready for its target
+
 Same model ID, same one-line API — the only thing that changes is the target. Pass execution_provider and you get a graph tuned for that runtime: CUDA gets GQA fusion, SkipLayerNorm, PackQKV; WebGPU swaps in portable alternatives with no CUDA-only ops; DirectML gets a Windows-optimized graph.
 
 The important framing: optimization happens at build time, not as a fragile post-hoc pass over an exported model. Under the hood it's 10 declarative rewrite rules that pattern-match and rewrite subgraphs — conceptually LLVM passes for ONNX. The graph is born ready for its target.
@@ -379,6 +442,9 @@ The skills, the workflow, the verification.
 </div>
 
 <!--
+- Section turn: what Mobius is → how an agent actually adds a model
+- The skills, the workflow, the verification
+
 Section divider. We've shown what Mobius is and why the architecture is shaped the way it is. Now the part that makes it scale: how an AI agent actually adds a model — the skills it follows, the workflow it runs, and how it verifies its own work.
 -->
 
@@ -406,6 +472,10 @@ graph TD
 ```
 
 <!--
+- Skills aren't loose docs — a structured tree the agent navigates
+- adding-a-new-model = master recipe → branches to components, weight alignment, tests → specialized (multimodal / MoE / diffusion) + quality + debugging
+- Agent doesn't improvise → output is consistent & reviewable
+
 The skills aren't loose docs — they're a structured tree the agent navigates. adding-a-new-model is the master recipe; it branches into reusable-components, weight-name-alignment, and writing-tests. Those in turn lead to specialized skills for multimodal, MoE, and diffusion models, plus quality checklists and debugging/profiling guides.
 
 The point: the agent doesn't improvise. It follows the same documented playbook an experienced human contributor would, which is exactly why agent output is consistent and reviewable.
@@ -434,6 +504,10 @@ A human designs the system; AI scales it.
 </div>
 
 <!--
+- The agent loop: read HF config → decide LLaMA-compatible (1 line) vs novel (new components) → implement by composing → align weight names → test L1–L5 → iterate to parity
+- Key: none of this works without the composable architecture + consistent patterns
+- A human designs the system once; AI scales it across hundreds of models
+
 Walk the six steps as the agent's actual loop. It reads the HF config to identify the architecture, decides whether it's LLaMA-compatible (one line) or genuinely novel (new components), implements by composing, aligns weight names, then tests through L1-L5 and iterates until numerical parity.
 
 Land on the insight at the bottom: none of this works without the composable architecture and consistent patterns. A human designs the system once; the AI scales it across hundreds of models.
@@ -464,6 +538,13 @@ How agents (and humans) verify correctness:
 </div>
 
 <!--
+- Correctness verified cheaply at every level
+- L1: graph builds (seconds, CPU, every PR)
+- L2: real HF configs, no weights
+- L3: synthetic parity, random weights
+- L4/L5: GPU — golden logits + full generation vs golden
+- Diff-based CI: AST analysis retests only affected models; core infra change → run all
+
 This is how correctness is verified at every level, cheaply. L1 just checks the graph builds — seconds on CPU, runs on every PR. L2 validates against real HF configs without weights. L3 does synthetic parity with random weights. L4 and L5 are the expensive GPU checks: golden-checkpoint logits and full generation against a golden reference.
 
 The diff-based CI is what keeps this affordable: AST analysis figures out which models a change actually affects and only retests those. Touch core infra and it runs everything.
@@ -488,6 +569,12 @@ The agent doesn't just run tests — it **knows what a failure means** and can f
 </v-clicks>
 
 <!--
+- Each level maps to a distinct failure class — a failure is a diagnostic, not just red
+- L1 → graph construction bug
+- L3 → numerical error
+- L4/L5 → weight loading / accumulation
+- Agent knows where to look → closes the loop itself, no human triage
+
 This is the crux of why the testing pyramid matters for agents specifically. Each level maps to a distinct failure class: an L1 failure is a graph-construction bug, an L3 failure is a numerical error, an L4/L5 failure points at weight loading or accumulation. So a test failure isn't just red — it's a diagnostic that tells the agent where to look. The agent closes the loop on its own instead of waiting for a human to triage.
 -->
 
@@ -526,6 +613,11 @@ An **audio-to-audio** model. Not text gen. Not vision. Something ONNX has rarely
 </div>
 
 <!--
+- Proof it generalizes beyond text — audio-to-audio
+- NVIDIA full-duplex voice, Moshi architecture, 7B, audio in → audio out, no STT-LLM-TTS pipeline; ONNX rarely sees this
+- Agent: classified novel → composed new audio components, reused attention/norm → end-to-end graph + streaming server
+- 2–3 days, fully tested → new modality, same workflow as the hundredth text model
+
 This is the proof that the approach generalizes beyond text. PersonaPlex is audio-to-audio — NVIDIA's full-duplex voice model on the Moshi architecture, 7B params, audio in and audio out, no STT-LLM-TTS pipeline. It's exactly the kind of thing ONNX rarely sees.
 
 An agent picked it up, classified it as novel, composed new audio components while reusing existing attention and norm blocks, and produced an end-to-end graph plus a streaming inference server in two to three days, fully tested. The takeaway: a brand-new modality went through the same workflow as the hundredth text model.
@@ -573,6 +665,11 @@ registry.register("my_secret_model", MyProprietaryModel)
 </div>
 
 <!--
+- Not just our models — third parties build private architectures, same optimized path for free
+- Compose from the same components; EP optimizations inherited automatically
+- Weights stay private (only architecture definition needed at build); any weight format; same L1–L5 infra
+- Flywheel: external users exercise components → find bugs, add ops → components improve → more models adopt → repeat
+
 Mobius isn't only for the models we ship — third parties can build their own private architectures against it and get the same optimized path for free. They compose from the same battle-tested components, inherit EP optimizations automatically, keep their weights private (only the architecture definition is needed at build time), bring any weight format, and validate with the same L1-L5 infra.
 
 Close on the flywheel: external users exercise the components, find bugs and add ops, the components improve, and more models adopt them. The ecosystem compounds.
@@ -613,6 +710,10 @@ Close on the flywheel: external users exercise the components, find bugs and add
 </div>
 
 <!--
+- Breadth across every modality — all through the same construction path
+- PersonaPlex now sits in Audio next to Wav2Vec2 / Whisper
+- Headline: 130+ model types · 56+ components · 14 task types — one canonical construction each
+
 Don't read the table — let it land visually. The point is breadth across every modality: text gen, MoE, multimodal, encoders, encoder-decoders, audio, vision, and diffusion all go through the same construction path. Note that PersonaPlex now sits in the Audio column alongside Wav2Vec2 and Whisper.
 
 The bottom line is the headline number: 130+ model types, 56+ shared components, 14 task types — one canonical construction each.
@@ -639,6 +740,13 @@ Coming this summer. Pairs with Olive for end-to-end optimization.
 </div>
 
 <!--
+- Build for standardization, not translation — one canonical output per architecture
+- Memory efficient: shape-only params + LazyTensor → any model size
+- AI-native: skills + L1–L5 → agents add models autonomously
+- EP-aware: born optimized for the target runtime
+- Composable: 56+ components across 130+ architectures
+- Availability: coming this summer; pairs with Olive for end-to-end optimization
+
 Five takeaways, one per click. Build for standardization, not translation. Memory efficiency makes any model size buildable. AI-native means agents add models autonomously, backed by skills and L1-L5 testing. EP-aware means born optimized for the target runtime. And composability ties it together — 56+ components across 130+ architectures.
 
 Close on availability: coming this summer, and it pairs with Olive for the end-to-end optimization story.
@@ -658,5 +766,8 @@ Justin Chu · justinchuby
 </div>
 
 <!--
+- Q&A — be ready for: construction vs torch.export in practice; weight-name alignment across checkpoint formats; EP coverage beyond CUDA/WebGPU/DirectML; how out-of-tree teams start
+- Pairs with Olive for end-to-end device optimization
+
 Thanks — happy to take questions. Good things to be ready for: how construction compares to torch.export in practice, how weight-name alignment is handled across checkpoint formats, what the EP coverage looks like beyond CUDA/WebGPU/DirectML, and how out-of-tree teams get started. Mention it pairs with Olive for end-to-end device optimization.
 -->
