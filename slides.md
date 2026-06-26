@@ -396,16 +396,16 @@ The architecture isn't just clean — it's deliberately shaped so many agents (o
 from mobius import build
 
 # CUDA: GQA fusion, SkipLayerNorm, PackQKV
-pkg = build("meta-llama/Llama-3.2-1B",
+pkg = build("google/gemma-4-12B-it",
             execution_provider="cuda", dtype="f16")
 
 # WebGPU: portable alternatives, no CUDA-only ops
-pkg = build("meta-llama/Llama-3.2-1B",
+pkg = build("google/gemma-4-12B-it",
             execution_provider="webgpu", dtype="f16")
 
-# DirectML: Windows-optimized graph
-pkg = build("meta-llama/Llama-3.2-1B",
-            execution_provider="dml", dtype="f16")
+# ONNX standard ops only model
+pkg = build("google/gemma-4-12B-it",
+            execution_provider="onnx-standard", dtype="f16")
 ```
 
 
