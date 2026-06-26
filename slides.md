@@ -178,12 +178,8 @@ Deterministic. Composable.
 
 # From Curated to Community Scale
 
-<div class="mt-4 text-lg">
 
-With Model Builder we can build ~20 text-to-text architectures.<br>
-But the HuggingFace ecosystem has **300+** across every modality.
-
-</div>
+<ScaleAnimation />
 
 <v-click>
 
@@ -194,18 +190,18 @@ How do we scale construction to the entire ecosystem?
 </v-click>
 
 <!--
-- Model Builder: ~20 text-to-text architectures, done by hand
-- HF ecosystem: 300+ model types across every modality — can't do that manually
-- Question: how do we scale construction to the whole ecosystem?
+With Model Builder we can build ~20 text-to-text architectures.<br>
+But the HuggingFace ecosystem has **300+** across every modality.
 
 Construction is the right direction, but there aren't enough hands. ~20 curated text-to-text models can be done manually; 300+ model types across 8+ modalities cannot. The audience now understands what construction is, which gives the upcoming animation its context.
+
+How do we scale construction to the entire ecosystem?
 -->
 
 ---
 
 # The Scale: Visualized
 
-<ScaleAnimation />
 
 <!--
 - Walk the animation: ~20 today → zoom out to 8 modalities → light up "with Mobius, scale across all of them"

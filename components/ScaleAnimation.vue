@@ -48,7 +48,7 @@
         </span>
       </div>
       <button class="btn" @click.stop="next">
-        {{ phase === 0 ? '→ Zoom out' : phase === 1 ? '→ Light them up' : '✓ Done' }}
+        {{ phase === 0 ? '→ Zoom out' : phase === 1 ? '→ Light them up' : '↻ Replay' }}
       </button>
     </div>
   </div>
@@ -60,7 +60,7 @@ import { ref } from 'vue'
 const phase = ref(0)
 
 function next() {
-  if (phase.value < 2) phase.value++
+  phase.value = phase.value < 2 ? phase.value + 1 : 0
 }
 
 // Model Builder only covers ~10 text gen models
