@@ -60,15 +60,13 @@ At this scale, we need something different.
 </div>
 
 <!--
-- Converting a HF model to ONNX with the Torch exporter — every one of these can bite you
-- Dynamic shapes: shapes specialized at runtime → breaks export
-- Unsupported operators: control flow, Python-only logic, new PyTorch ops
-- Graph cleanup & fusion: patterns shift with transformers / PyTorch, vary per model
-- Signature/architecture changes: I/O & tensor-layout tweaks to fit ONNX conventions
-- Quantized models: low-bit has no standard traceable form
-- Transition: not that export is bad — at this scale & churn, we need something different
+Now, to convert these models into ONNX using the Torch exporter, conversion is still hard for a few reasons:
 
-Walk through each pain point with the bullets. To convert a Hugging Face model into ONNX with the Torch exporter, every one of these can bite you. The last line is the transition: it's not that export is bad — it's that at this scale, with this much churn, we need a different approach.
+- **Dynamic shapes** - models specializes shape information in runtime (breaks export)
+- **Unsupported operators** - control flow, Python-only logic, new PyTorch ops
+- **Graph clean up and node fusion** - patterns change with `transformers` and PyTorch updates / varies among models
+- **Model signature / architecture changes** Some models require input/output/tensor layout changes to fit onnx conventions
+- **Quantized models** Low-bit representation doesn't have a standard tracible representation
 -->
 
 ---
