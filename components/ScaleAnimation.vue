@@ -2,8 +2,7 @@
   <div class="scale-animation" @click="next">
     <div class="phase-label">
       <span v-if="phase === 0">Today: ONNX Runtime Model Builder — ~20 curated architectures</span>
-      <span v-else-if="phase === 1">The full picture: 300+ architectures across 8 modalities</span>
-      <span v-else>With Mobius, we can scale across all of them.</span>
+      <span v-else>The full picture: 300+ architectures across 8 modalities</span>
     </div>
 
     <div class="grid-wrapper" :class="{ zoomed: phase >= 1 }">
@@ -20,12 +19,7 @@
             class="cell"
             :class="{
               'builder': cell.builder,
-              'mobius': cell.mobius && !cell.builder && phase >= 2,
-              'future': !cell.mobius,
-              'lit': phase >= 2 && cell.mobius && !cell.builder
-            }"
-            :style="{
-              animationDelay: cell.mobius ? `${(cell.animIdx % 30) * 80}ms` : '0ms'
+              'future': !cell.builder
             }"
           >
             <span v-if="phase === 0 && cell.builder && cell.name" class="label">{{ cell.name }}</span>
@@ -37,18 +31,13 @@
     <div class="bottom-bar">
       <div class="legend" v-if="phase >= 1">
         <span class="legend-item">
-          <span class="dot" style="background: #3b82f6"></span> Model Builder
+          <span class="dot" style="background: #3b82f6"></span> Model Builder (~20)
         </span>
         <span class="legend-item">
-          <span class="dot" style="background: #10b981"></span> Mobius today
-        </span>
-        <span class="legend-item">
-          <span class="dot" style="background: #e2e8f0"></span> Community (future)
+          <span class="dot" style="background: #e2e8f0"></span> 300+ across the ecosystem
         </span>
       </div>
-      <button class="btn" @click.stop="next">
-        {{ phase === 0 ? '→ Zoom out' : phase === 1 ? '→ Light them up' : '↻ Replay' }}
-      </button>
+      <div class="hint">{{ phase === 0 ? 'Click to zoom out →' : 'Click to replay ↻' }}</div>
     </div>
   </div>
 </template>
@@ -59,7 +48,7 @@ import { ref } from 'vue'
 const phase = ref(0)
 
 function next() {
-  phase.value = phase.value < 2 ? phase.value + 1 : 0
+  phase.value = phase.value === 0 ? 1 : 0
 }
 
 // Model Builder supported architectures (verified)
@@ -293,18 +282,9 @@ const categories = [
   display: inline-block;
 }
 
-.btn {
-  padding: 0.35rem 1rem;
-  border-radius: 6px;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
+.hint {
+  font-size: 0.8rem;
+  color: #94a3b8;
   font-weight: 500;
-}
-
-.btn:hover {
-  background: #2563eb;
 }
 </style>
