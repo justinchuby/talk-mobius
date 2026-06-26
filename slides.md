@@ -193,7 +193,7 @@ How do we scale construction to the entire ecosystem?
 With Model Builder we can build ~20 text-to-text architectures.<br>
 But the HuggingFace ecosystem has **300+** across every modality.
 
-Construction is the right direction, but there aren't enough hands. ~20 curated text-to-text models can be done manually; 300+ model types across 8+ modalities cannot. The audience now understands what construction is, which gives the upcoming animation its context.
+We know construction is the right direction, but there aren't enough hands.
 
 How do we scale construction to the entire ecosystem?
 -->
