@@ -236,8 +236,8 @@ That's what Mobius does.
 from mobius import build
 
 # That's it. One line.
-pkg = build("meta-llama/Llama-3.2-1B")
-pkg.save("output/llama/")
+pkg = build("google/gemma-4-12B-it")
+pkg.save("output/gemma-4-12b/")
 ```
 
 <v-clicks>
